@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -11,8 +17,9 @@ option java_outer_classname = "ThreatsProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 //
-// DetectedCoordinate
-// Contains the detected coordinate along with optional error values for LLA.
+// The DetectedCoordinate message contains a detected coordinate value
+// along with optional error values for that position. The error values support
+// calculating error volumes and signal confidence.
 //
 message DetectedCoordinate {
   CoordinateLla position = 1; // the detected position
@@ -22,8 +29,9 @@ message DetectedCoordinate {
 }
 
 //
-// DetectedLineOfBearing
-// Contains a line of bearing along with optioounal error information for Az/El/Range
+// The DetectedLineOfBearing message contains a detected line of bearing along with
+// optional error information for Az/El/Range. The error values support
+// calculating error volumes and signal confidence.
 //
 message DetectedLineOfBearing {
   LineOfBearing lob = 1;
@@ -33,19 +41,19 @@ message DetectedLineOfBearing {
 }
 
 //
-// TargetEtaInfo
-// The estimated time of arrival information for a target.
+// The TargetEtaInfo message contains details about the estimated time of arrival (TOA)
+// information for a given target.
 //
 message TargetEtaInfo {
-  int32 eta = 1; // the ETA to the Protected Area
-  string paName = 2; // name of the Protected Area that this applies to
+  int32 eta = 1; // The ETA to a given Protected Area.
+  string paName = 2; // The name of the Protected Area that the ETA applies to.
 }
 
 //
-// TargetDimension
-// The dimensionality of this (threat/track). If position is set then the threat has a lat/lon position. If lob is set
-// then the threat has az/el/range values. If neither of the values are set (None), then this is a 0D threat, and the
-// qualities field should be examined for known values.
+// The TargetDimension message contains the dimensionality of a threat or track.
+// If position is set then the threat has a lat/lon position. If lob is set
+// then the threat has az/el/range values. If neither of the values are set (None),
+// then this is a 0D threat, and the {@link TrackQualities} field should be examined for known values.
 //
 message TargetDimension {
   oneof spatial {
@@ -59,8 +67,8 @@ message TargetDimension {
 }
 
 //
-// TargetLinkedComponentType
-// The type of the UAS component
+// The TargetLinkedComponentType enumeration is used in conjunction with the
+// {@link TargetLinkedComponent} message. It defines the type of the linked UAS component.
 //
 enum TargetLinkedComponentType {
   UNKNOWN = 0;
@@ -69,9 +77,9 @@ enum TargetLinkedComponentType {
 }
 
 //
-// TargetLinkedComponent
-// Used for associating other components of a UAS with the Drone that was detected
-// This would typically be an associated location, such as the controller or home location for a drone
+// The TargetLinkedComponent message is used for associating other components/positions
+// of a UAS with the Drone that was detected. This would typically be an associated location,
+// such as the controller or home location for a drone.
 //
 message TargetLinkedComponent {
   string name = 1; // the name of the associated UAS component
@@ -81,30 +89,25 @@ message TargetLinkedComponent {
 }
 
 //
-// TargetDeliveryState
-// The state of the delivery of a threat or a target to a client. Contains potential reason for
-// NOT receiving the threat or track as well.
+// The TargetDeliveryState enumeration details the state of the delivery of a threat
+// or a target to a client. Contains potential reason for NOT receiving the threat or track as well.
 //
 enum TargetDeliveryState {
   TARGET_STATE_UNKNOWN = 0; // unknown / unset state
-  // set if this is the first instance of a track or threat being sent from a device or from Valkyrie
+  // Set if this is the first instance of a track or threat being sent from a device or from Valkyrie.
   TARGET_STATE_BEGIN = 1;
-
-  // set if a track or threat has stopped being received or timed out, and no more delivery of it will occur
+  // Set if a track or threat has stopped being received or has timed out, and no more delivery of it will occur.
   TARGET_STATE_END = 2;
-
-  // set if a track or threat has entered a state in which it is filtered from a client, and will not be delivered to
+  // Set if a track or threat has entered a state in which it is filtered from a client, and will not be delivered to
   // that client any more, while the filtering conditions remain. A threat may enter and leave this state multiple times
   // during its life, while it will only reach a state of THREAT_STATE_END once.
   TARGET_STATE_FILTERED = 3;
-
-  // standard state for a threat or track - not the first or last instance of this message
+  // Standard state for a threat or track - not the first or last instance of this message.
   TARGET_STATE_STANDARD = 4;
 }
 
 //
-// ThreatInfo
-// Details for one threat propagated through the system
+// The ThreatInfo message contains details for one threat propagated through the system.
 //
 message ThreatInfo {
   int64 threatId = 1; // Unique (temporarily) ID for this threat
@@ -136,9 +139,8 @@ message ThreatInfo {
 }
 
 //
-// TrackInfo
-// Details for one track within the system. This can be a standalone track coming from a
-// device, and it also is a repeated field within threats.
+// The TrackInfo message contains details for one track within the system. This can be a standalone
+// track coming from a device, and it also is a repeated field within threats.
 //
 message TrackInfo {
   int64 trackId = 1; // id used to tie the detection information to a threat
@@ -162,8 +164,8 @@ message TrackInfo {
 }
 
 //
-// TrackSystemType enum
-// Represents the rough type/category of device this track came from
+// The TrackSystemType enumeration represents the rough type/category of the
+// device a track came from.
 //
 enum TrackSystemType {
   TRACK_SYSTEM_OTHER = 0[(description) = "Other"];
@@ -175,8 +177,8 @@ enum TrackSystemType {
 }
 
 //
-// ClassificationType
-// classification details for a track or threat
+// The TargetClassification enumeration provides classification type
+// for a track or threat.
 //
 enum TargetClassification {
   CLASS_TYPE_PENDING = 0[(description) = "Pending"];
@@ -188,8 +190,7 @@ enum TargetClassification {
 
 
 //
-// TrackDiscriminationFeature
-// This class contains specific evaluations and business logic for information
+// The TrackDiscriminationFeature message contains specific evaluations and business logic for information
 // contained within a repeated track discrimination value.
 //
 message TrackDiscriminationFeature {
@@ -202,8 +203,7 @@ message TrackDiscriminationFeature {
 }
 
 //
-// TrackClassification
-// Classification information about a target
+// The TrackClassification message contains classification details about a target.
 //
 message TrackClassificationInfo {
   TargetClassification type = 1; // The overall Classification of the track, if available.
@@ -214,8 +214,9 @@ message TrackClassificationInfo {
 }
 
 //
-// TrackDiscrimination
-// A discriminating element of a track classification
+// The TrackDiscrimination message contains discriminating values for a track, primarily as a series
+// of name/value pairs (feature and discrimination) for placing additional information on a track used
+// within the processing of tracks in the system.
 //
 message TrackDiscrimination {
   google.protobuf.DoubleValue confidence = 1; // 0 - 1  The confidence of this one discrimination
@@ -224,8 +225,8 @@ message TrackDiscrimination {
 }
 
 //
-// TrackQualities
-// Qualities of a track that are mutually exclusive.
+// The TrackQualities message contains RF or acoustic qualities of a track. Note that only one of these
+// quality fields can be set for a track.
 //
 message TrackQualities {
   oneof data {
@@ -235,8 +236,7 @@ message TrackQualities {
 }
 
 //
-// TrackRfQualities
-// details for one RF track
+// The TrackRfQualities message contains details for one RF-based track.
 //
 message TrackRfQualities {
   string signalType = 1; // A string indicating what kind of EW signal is present.
@@ -247,8 +247,7 @@ message TrackRfQualities {
 }
 
 //
-// TrackAcousticQualities
-// details for one acoustic track
+// The TrackAcousticQualities message contains details for one acoustic-based track.
 //
 message TrackAcousticQualities {
   string signalType = 1; // A string indicating what kind of audio signal is present

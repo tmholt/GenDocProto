@@ -12,98 +12,71 @@ option java_outer_classname = "ThreatsManagerProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 //
-// ThreatsManager
-// The threats manager service provides public calls into the VALKYRIE system for
+// The threats manager service provides public calls into the Valkyrie system for
 // threat-related actions. The client can subscribe to threats as
 // they occur. This interface also supports addition of threats into the system.
 //
 service ThreatsManager {
 
   //
-  // getVersion
-  // Get the version of the threats manager.
-  // Input parameters: none
-  // Output: VersionInfo proto class, containing version details
+  // Retrieves version information for the SystemsManager service.
   //
-
   rpc getVersion (google.protobuf.Empty) returns (VersionInfo);
 
   //
-  // subscribe
-  // Subscribe to either threats from the valkyrie correlation application or user affiliations changes.
-  // stream without a definitive end to the set. The client will continue to receive
-  // ThreatsManagerSubscriptionResponse objects until the request is made to stop or the server is shut down.
-  // Input: Details about the subscription for this client
-  // Output: The stream through which the changes will be received by the client as they
-  // occur within the VALKYRIE system.
+  // Subscribe to the threats manager for threats, user affiliation, and user classification changes.
+  // The client will receive ThreatsManagerSubscriptionResponse objects until the subscription is cancelled. <br/>
+  // Input: Details about the subscription for this client <br/>
+  // Output: The output stream of threats manager events to the subscribed client
   //
   rpc subscribe (ThreatsManagerSubscription) returns (stream ThreatsManagerSubscriptionResponse);
 
   //
-  // addThreat
-  // Ability to add a complete threat into the DON system. This will bypass the
-  // VALKYRIE correlator, and will instead act as if it came from the correlator
-  // and into our threat prioritization process.
-  // Input: The threat definition and insertion details to include into the VALKYRIE system
+  // Ability to add a complete threat into the Valkyrie system. This will bypass the
+  // Valkyrie correlator, and will instead feed it into the threats pipeline, which includes
+  // going through the threat prioritization process and sending it to subscribed clients. <br/>
+  // Input: The threat details to include into the VALKYRIE system <br/>
   // Output: A standard response class with success/failure information
   //
   rpc addThreat (ThreatAdditionDetails) returns (ResponseInfo);
 
   //
-  // setAffiliation
-  // Ability to overwrite the Affiliation of a threat that already exists in the
-  // system. Should behave the same as if the HMI operator made an affiliation
-  // change.
-  // Input: The client threat affiliation definition
+  // Ability to override the affiliation of an existing threat in the system.  <br/>
+  // Input: The client threat affiliation definition <br/>
   // Output: A standard response class with success/failure information
   //
   rpc setAffiliation (TargetAffiliationInfo) returns (ResponseInfo);
 
   //
-  // getAffiliations
-  // Ability to request user affiliations changes.
-  //
-  // Input: None
-  // Output: A stream of TargetAffiliationInfo objects containing the threat IDs and associated
-  // affiliations
+  // Ability to request all user-defined threat affiliations. Returns a stream of
+  // {@link TargetAffiliationInfo} objects containing the threat IDs and defined
+  // affiliations.
   //
   rpc getAffiliations (google.protobuf.Empty) returns (stream TargetAffiliationInfo);
 
   //
-  // setClassification
-  // Ability to overwrite the Classification of a threat that already exists in the
-  // system. Should behave the same as if the HMI operator made a classification change.
-  // Input: The client threat classification definition
+  // Ability to override the classification of an existing threat in the system. <br/>
+  // Input: The client threat classification definition <br/>
   // Output: A standard response class with success/failure information
   //
   rpc setClassification (TargetClassificationInfo) returns (ResponseInfo);
 
   //
-  // getClassifications
-  // Ability to request user classifications changes.
-  //
-  // Input: None
-  // Output: A stream of TargetClassificationInfo objects containing the threat IDs and associated
-  // classifications
+  // Ability to request all user-defined threat classifications. Returns a stream of
+  // {@link TargetClassificationInfo} objects containing the threat IDs and defined
+  // classifications.
   //
   rpc getClassifications (google.protobuf.Empty) returns (stream TargetClassificationInfo);
 
   //
-  // getThreats
-  // Ability to request all threats currently in the system.
-  //
-  // Input: None
-  // Output: A stream of ThreatInfo objects
+  // Ability to request all threats currently in the system. Returns a stream
+  // of ThreatInfo objects.
   //
   rpc getThreats (google.protobuf.Empty) returns (stream ThreatInfo);
 
   //
-  // getThreat
   // Ability to request one or more specific threats currently in the system
-  // based on a known threat id.
-  //
-  // Input: None
-  // Output: A stream of matching ThreatInfo objects
+  // based on a set of known threat ids.
   //
   rpc getThreat (ThreatDetailsRequest) returns (stream ThreatInfo);
 
@@ -123,27 +96,25 @@ service ThreatsManager {
 }
 
 //
-// ThreatDetailsRequest
-// A request to get the details for one or more threat ids
+// The ThreatDetailsRequest message contains input details for the  {@link getThreat} call
+// on the threats manager. Contains 1 or more threat ids to get the threat details for.
 //
 message ThreatDetailsRequest {
   repeated int64 threatId = 1;
 }
 
 //
-// ThreatAdditionDetails
-// details for adding a threat into the Valkyrie system
-// NOTE: Keeping this around, even with one "detail," for possible future information keeping
+// The ThreatAdditionDetails message contains details for adding a threat into the Valkyrie system.
+// NOTE: Keeping this around, even with one "detail," for possible future information keeping.
 //
 message ThreatAdditionDetails {
-  reserved 1; //formerly used for ThreatAdditionPosition
+  reserved 1; // formerly used for ThreatAdditionPosition
   ThreatInfo threat = 2; // the threat to be added
 }
 
 //
-// ThreatsManagerSubscription
-// The ThreatsManager subscription.
-// Allows the client to choose what to subscribe to from the ThreatsManager.
+// The ThreatsManagerSubscription message contains details for subscribing to the threats manager.
+// This allows the client to choose the specifics for what to receive.
 //
 message ThreatsManagerSubscription {
   bool subscribeToAffiliations = 1; // whether to subscribe to affiliations changes
@@ -154,8 +125,8 @@ message ThreatsManagerSubscription {
 }
 
 //
-// TargetClassificationInfo
-// Ability to get/set the classification type for a target given its ID.
+// The TargetClassificationInfo message contains details for setting (or getting) the
+// classification type for a target given its ID.
 //
 message TargetClassificationInfo {
   TargetIdentifier target = 1; // the target
@@ -163,8 +134,8 @@ message TargetClassificationInfo {
 }
 
 //
-// ThreatClassificationResponse
-// The response for user classification change subscriptions.
+// The ThreatClassificationResponse message provides the details for a change to a threat's classification.
+// Sent as part of a client subscription.
 //
 message ThreatClassificationResponse {
   TargetClassificationInfo classificationInfo = 1; // the user classification info
@@ -172,8 +143,8 @@ message ThreatClassificationResponse {
 }
 
 //
-// ThreatAffiliationResponse
-// The response for user affiliation change subscriptions.
+// The ThreatAffiliationResponse message provides the details for a change to a threat's affiliation.
+// Sent as part of a client subscription.
 //
 message ThreatAffiliationResponse {
   TargetAffiliationInfo affiliationInfo = 1; // the user affiliation info
@@ -181,17 +152,19 @@ message ThreatAffiliationResponse {
 }
 
 //
-// FilterSummary
-// This message includes the number of threats that have been filtered for a subscription
+// The FilterSummary message contains a count of how many threats have been filtered out of the result
+// set for a given client. This is sent periodically to a client if subscribeToFilterSummary is set to true
+// when subscribing.
 //
 message FilterSummary {
   int64 threatsFiltered = 1;  // The number of threats that have been filtered
 }
 
 //
-// ThreatsManagerSubscriptionResponse
-// The response to expect when subscribed to ThreatsManager.
-// Based on client subscription it could be a threat, a filter summary, or an affiliation change
+// The ThreatsManagerSubscriptionResponse message is the top level wrapper message sent to a subscribed
+// client it contains one of 4 possible message types - a threat, filter summary, affiliation change, or
+// classification change. Only one of these values will be set. A client will only receive the type of
+// responses requested when subscribing.
 //
 message ThreatsManagerSubscriptionResponse {
   oneof data {

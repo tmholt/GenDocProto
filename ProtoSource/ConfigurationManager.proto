@@ -1,6 +1,11 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
-
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/wrappers.proto";
@@ -13,84 +18,90 @@ option java_package = "saic.valkyrie.sdk.generated";
 option java_outer_classname = "ConfigurationManagerProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
+//
+// The Configuration manager service maintains the configuration details for one Valkyrie installation,
+// including the devices installed, the networking details, the running services, and the defined protected
+// areas. This is the entry-point for communicating with the Valkyrie API, as it contains the details for
+// connecting with the other running services.
+//
 service ConfigurationManager {
 
   //
-  // getVersion
-  // Get the version of the Configuration manager. this is a unary blocking call.
+  // Retrieves version information for the ConfigurationManager service.
   //
   rpc getVersion (google.protobuf.Empty) returns (VersionInfo);
 
   //
-  // getProtectedAreas
   // Returns the set of protected areas that have been defined within the system configuration.
   //
   rpc getProtectedAreas (google.protobuf.Empty) returns (stream ProtectedAreaConfiguration);
 
   //
-  // getSystemLevels
-  // Returns the current operating level information for the system
+  // Returns the current operating level information for the system.
   //
   rpc getSystemLevels (google.protobuf.Empty) returns (SystemLevelsInfo);
 
   //
-  // setSystemLevels
-  // Set the current operating level information for the system
+  // Sets the current operating level information for the system.
   //
   rpc setSystemLevels (SystemLevelsInfo) returns (ResponseInfo);
 
-  // region SA object calls
+  //
+  // subscribe
+  // Ability for a client to receive async updates to the system configuration information.
+  // This currently includes changes to protected areas, SA objects, and system level details.
+  //
+  rpc subscribe (ConfigurationManagerSubscription) returns (stream ConfigurationSubscriptionResponse);
 
   //
-  // getSAObjects
-  // Returns the set of SA objects in the system for the inbound parameters of owner and groups
+  // Returns the active system configuration.
+  //
+  rpc getSystemConfig (google.protobuf.Empty) returns (SystemConfiguration);
+
+  //
+  // Returns the service configuration section of the system configuration, which contains
+  // details for all SDK services.
+  //
+  rpc getServicesConfig (google.protobuf.Empty) returns (ServicesConfigurationResponse);
+
+  // region SA object calls
+  // TODO VLKY-943: Move SA objects out of configuration manager. They don't belong here
+
+  //
+  // Returns the set of SA objects in the system for the inbound parameters of owner and groups.
   //
   rpc getSAObjects (SAObjectGetRequest) returns (stream SAObjectSubscriptionResponse);
 
   //
-  // getSAObjectGroups
-  // Returns the set of SA Object groups currently defined in the system
+  // Returns the full set of SA Object groups currently defined in the system.
   //
   rpc getSAObjectGroups (google.protobuf.Empty) returns (stream google.protobuf.StringValue);
 
   //
-  // createSAObject
-  // Creates a new SA object in the system
+  // Creates a new SA object in the system. Notifies out to subscribed clients with the correct
+  // permissions to know about this new SA object.
   //
   rpc createSAObject (SAObjectUpdateRequest) returns (SAObjectUpdateResponse);
 
   //
-  // updateSAObject
-  // Updates an existing SA object in the system
+  // Updates an existing SA object in the system. Notifies out to subscribed clients with the correct
+  // permissions to know about this modified SA object.
   //
   rpc updateSAObject (SAObjectUpdateRequest) returns (SAObjectUpdateResponse);
 
   //
-  // deleteSAObject
-  // Deletes an existing SA object in the system
+  // Deletes an existing SA object in the system. Notifies out to subscribed clients with the correct
+  // permissions to know about this deleted SA object.
   //
   rpc deleteSAObject (SAObjectDeleteRequest) returns (SAObjectUpdateResponse);
 
   // endregion
 
-  //
-  // subscribe
-  // Ability for a client to receive async updates to the system configuration information.
-  //
-  rpc subscribe (ConfigurationManagerSubscription) returns (stream ConfigurationSubscriptionResponse);
-
-  // getSystemConfig
-  // Returns the system configuration
-  rpc getSystemConfig (google.protobuf.Empty) returns (SystemConfiguration);
-
-  // getServicesConfig
-  // Returns the service configurations for all SDK services
-  rpc getServicesConfig (google.protobuf.Empty) returns (ServicesConfigurationResponse);
 }
 
 //
-// ConfigurationManagerSubscription
-// Inbound details for subscribing to the configuration manager
+// The ConfigurationManagerSubscription message contains inbound details for subscribing
+// to the configuration manager.
 //
 message ConfigurationManagerSubscription {
   bool subscribeToLevels = 1; // whether or not to receive changes to the system levels (classification, FPCON)
@@ -100,10 +111,9 @@ message ConfigurationManagerSubscription {
 }
 
 //
-// ConfigurationResponseType
 // When a client receives a ConfigurationSubscriptionResponse, it will be an update to one of the
-// sets of information being handled by the configuration manager. This defines which piece is being
-// returned
+// sets of information being handled by the configuration manager. This enumeration defines which piece is being
+// returned.
 //
 enum ConfigurationResponseType {
   CONFIGURATION_RESPONSE_UNKNOWN = 0;
@@ -113,9 +123,8 @@ enum ConfigurationResponseType {
 }
 
 //
-// ConfigurationSubscriptionResponse
-// wrapper around a configuration manager subscription response. Based on client subscription it could be
-// any of the values within ConfigurationResponseType.
+// The ConfigurationSubscriptionResponse message is a wrapper around a configuration manager subscription
+// response. Based on client subscription it could be a change to levels, protected areas, or an SA object.
 //
 message ConfigurationSubscriptionResponse {
   ConfigurationResponseType type = 1; // what type of data is represented here
@@ -127,9 +136,9 @@ message ConfigurationSubscriptionResponse {
 }
 
 //
-// ProtectedAreaSubscriptionResponse
-// This is the message that is returned to a subscribed client when a protected area change occurs within the system.
-// It tells you what kind of change just occurred - a create/update/delete
+// The ProtectedAreaSubscriptionResponse message contains details about one change to a protected area in
+// the system. It provides details about the protected area and  what kind of change just occurred -
+// a create/update/delete.
 //
 message ProtectedAreaSubscriptionResponse {
   SystemChangeType change = 1; // the type of change that has occurred - add/update/delete
@@ -137,9 +146,7 @@ message ProtectedAreaSubscriptionResponse {
 }
 
 //
-// SystemLevelsSubscriptionResponse
-// This is the message that is returned to a subscribed client when a system levels change occurs within the system.
-// It tells you what kind of change just occurred - a create/update/delete
+// The SystemLevelsSubscriptionResponse message contains details regarding a change to system levels.
 //
 message SystemLevelsSubscriptionResponse {
   SystemChangeType change = 1; // the type of change that has occurred - add/update/delete
@@ -147,8 +154,7 @@ message SystemLevelsSubscriptionResponse {
 }
 
 //
-// SystemLevelsInfo
-// This message defines the current operating levels of the system
+// The SystemLevelsInfo message defines the current operating levels of the system.
 //
 message SystemLevelsInfo {
   FPCONLevel level = 1; // current FPCON operating level
@@ -159,8 +165,8 @@ message SystemLevelsInfo {
 
 
 //
-// ServicesConfigurationResponse
-// Response when getSdkServicesConfig call is made to ConfigurationManager is made
+// The ServicesConfigurationResponse message contains the details of all running services at a Valkyrie
+// installation. This is the response from the {@link getSdkServicesConfig} call.
 //
 message ServicesConfigurationResponse {
   repeated ServiceConfiguration services = 1; // List of SDK service configurations

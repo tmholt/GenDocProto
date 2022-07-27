@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -12,44 +18,38 @@ option java_outer_classname = "SystemsManagerProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 //
-// The systems manager service provides public calls into the VALKYRIE system for high-level systems io,
-// such as receiving server's services status, client services status, alerts, and heartbeats.
-// It also supports loading of initial configuration values such as system protected areas.
+// The systems manager service provides public calls into the Valkyrie system for available system services.
+// This includes receiving service status, client services status, and heartbeats.
 //
 service SystemsManager {
 
   //
-  // getVersion
-  // Get the version of the systems manager. this is a unary blocking call.
+  // Retrieves version information for the SystemsManager service.
   //
   rpc getVersion (google.protobuf.Empty) returns (VersionInfo);
 
   //
-  // getStatuses
   // Get the most recent set of system statuses maintained within the systems manager.
-  // Input parameters: none
-  // Output: ServiceSubscriptionResponse, containing one response per system
+  // Returns the set of statuses as a single message.
   //
   rpc getStatuses (google.protobuf.Empty) returns (ServiceSubscriptionResponse);
 
   //
-  // publish
-  // A publish call from a Valkyrie service. Provides status from one Valkyrie service
+  // A publish call from a Valkyrie service. Pushes status from one Valkyrie service to the
+  // SystemsManager, which maintains golden status for a service and publishes periodically
+  // to subscribed clients.
   //
   rpc publish (ServiceStatusInfo) returns (ResponseInfo);
 
   //
-  // subscribe
-  // Ability for a client to receive status for services within the system on a periodic basis -
-  // both from DON and SDK services.
+  // Ability for a client to receive status for services within the system on a periodic basis.
   //
   rpc subscribe (ClientSystemsSubscription) returns (stream ServiceSubscriptionResponse);
 }
 
 //
-// ClientSystemSubscription
-// inbound subscription details for this client. ability to subscribe to different
-// event types for system services.
+// The ClientSystemSubscription message contains inbound subscription details for this client.
+// This provides the ability to subscribe to a constrained set of event types for system services.
 //
 message ClientSystemsSubscription {
   repeated string services = 1; // filtering for which service names to receive status for. if empty no filtering.

@@ -1,7 +1,14 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
 import "Common.proto";
+import "Drawing.proto";
 
 package saic.valkyrie.sdk.generated;
 option java_package = "saic.valkyrie.sdk.generated";
@@ -10,9 +17,8 @@ option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 
 //
-// SAObjectAccessType
-// Tells the receiver of an SA object what access she has to that SA object.
-// Options are read-only or read-write.
+// The SAObjectAccessType enumeration contains possible options for what access
+// one client has to an SA object. Options are read-only or read-write.
 //
 enum SAObjectAccessType {
 	SA_ACCESS_UNKNOWN = 0; // unknown/bad state
@@ -21,11 +27,10 @@ enum SAObjectAccessType {
 }
 
 //
-// SAObjectSubscriptionResponse
-// This is the message that is returned to a client either from a get or from a subscription when a SAObject change
-// occurs within the system.
-// It tells you what kind of change just occurred - a create/update/delete, and what access this client has to
-// the sa object in question.
+// The SAObjectSubscriptionResponse message is returned to a client either from a get or from a
+// subscription when a SAObject change event occurs within the system.
+// It tells a client what kind of change just occurred - a create/update/delete, and what access
+// this client has to the SA object in question.
 //
 message SAObjectSubscriptionResponse {
 	SystemChangeType change = 1; // the type of change that has occurred - add/update/delete
@@ -34,11 +39,12 @@ message SAObjectSubscriptionResponse {
 }
 
 //
-// SAObjectGetRequest
-// A request to get a set of SA objects, either via a get or through a subscription.
-// The caller will receive all SA objects that:
-//      1. Are owned by the provided owner id
-//      2. Belong to one of the defined group ids provided
+// The SAObjectGetRequest message contains details for a request to get a set of SA objects, either
+// via a get or through a subscription. The caller will receive all SA objects that:
+// <ol>
+//   <li>   1. Are owned by the provided owner id                </li>
+//   <li>   2. Belong to one of the defined group ids provided   </li>
+// </ol>
 //
 message SAObjectGetRequest {
 	string ownerId = 1; // for SA object subscription, subscribe to SA objects with this owner id
@@ -46,8 +52,8 @@ message SAObjectGetRequest {
 }
 
 //
-// SAObjectUpdateResponse
-// This is the message that is returned after a create/update/delete
+// The SAObjectUpdateResponse message contains details of the response to a SA object modification request
+// - a create/update/delete.
 //
 message SAObjectUpdateResponse {
 	SAObjectInfo sa = 1; // the SAObject being reported on
@@ -56,8 +62,7 @@ message SAObjectUpdateResponse {
 }
 
 //
-// SAObjectUpdateRequest
-// The top level message for creating or modifying an SA object.
+// The SAObjectUpdateRequest message contains details for creating or modifying an SA object.
 //
 message SAObjectUpdateRequest {
 	// the owner for this SA object. for a create, this defines the only id that can modify or delete this SA object.
@@ -69,8 +74,7 @@ message SAObjectUpdateRequest {
 }
 
 //
-// SAObjectDeleteRequest
-// The top level message for deleting an SA object.
+// The SAObjectDeleteRequest message contains details for deleting an SA object.
 //
 message SAObjectDeleteRequest {
 	string ownerId = 1; // the owner for this SA object. Will fail if doesn't match creation owner.
@@ -78,9 +82,8 @@ message SAObjectDeleteRequest {
 }
 
 //
-// SAObjectInfo
-// The top level message that will be streamed back when a SAObject is requested.
-// It is actually made up of one of several sub-objects which will be streamed back-to-back within this
+// The SAObjectInfo message contains details about one SA object.
+// It is made up of one of several sub-objects which will be streamed back-to-back within this
 // returned set. Each SAObject will contain ONE of the sub-objects types.
 //
 message SAObjectInfo {

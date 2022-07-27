@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -42,13 +48,13 @@ message HeatmapHistoricalRequest {
 //
 message HeatmapLiveRequest {
   // how far back (in seconds) to include in the initial response to this request
-  int64 initialHistorySeconds = 1;
+  int32 initialHistorySeconds = 1;
   // if threats should be timed out of the report data. if so, how old the data should
   // be in order to be timed out (in seconds)
   // NOTE: if timeoutPeriod >= initialHistory then all initialHistory will immediately
   //       be timed out
   // NOTE: setting this value to 0 means do not time out threats from the heatmap data
-  int64 timeoutPeriodSeconds = 2;
+  int32 timeoutPeriodSeconds = 2;
 
   // how often to send updates
   int32 updatePeriodSeconds = 3;

@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -10,8 +16,9 @@ option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 
 //
-// DeviceTemplate
-// One definition of a device template, which is used as a baseline for a newly configured device
+// The DeviceTemplate message contains one definition of a device template, which is used as a baseline
+// for a newly configured device. This is primarily used in the RAVEN product as a starting point for
+// configuring devices for an installation.
 //
 message DeviceTemplate {
   string version = 1; // proto version for the DeviceConfiguration

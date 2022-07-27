@@ -1,8 +1,15 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
 import "google/protobuf/wrappers.proto";
 import "Common.proto";
+import "Drawing.proto";
 import "Filter.proto";
 
 package saic.valkyrie.sdk.generated;
@@ -11,8 +18,8 @@ option java_outer_classname = "SystemConfigurationProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 //
-// SystemConfiguration
-// Contains the complete configuration suite
+// The SystemConfiguration message contains the complete configuration
+// details for a Valkyrie installation.
 //
 message SystemConfiguration {
   string version = 1; // The version of this file
@@ -24,8 +31,8 @@ message SystemConfiguration {
 }
 
 //
-// ServiceConfiguration
-// Contains the necessary information for an SDK service
+// The ServiceConfiguration message contains details for one SDK service, and how to
+// connect to it.
 //
 message ServiceConfiguration {
   SdkServiceType type = 1; // SDK Service type
@@ -33,8 +40,7 @@ message ServiceConfiguration {
 }
 
 //
-// SdkServiceType
-// Defines the available SDK service types.
+// The SdkServiceType enumeration defines the available SDK service types.
 //
 enum SdkServiceType {
   SDK_SERVICE_UNKNOWN = 0[(description) = "Unknown"]; // Error / unset
@@ -47,18 +53,16 @@ enum SdkServiceType {
 }
 
 //
-// GlobalSettingsConfiguration
-// Contains the global settings
+// The GlobalSettingsConfiguration message contains details about the global configuration settings.
 //
 message GlobalSettingsConfiguration{
   ClassificationLevel classification = 1; // Classification
   bool stopJamOnDisconnect = 2; // Flag for behavior upon client disconnect
 }
 
-
 //
-// ProtectedAreaConfiguration
-// Details about one defined protected area within the system
+// The ProtectedAreaConfiguration message contains details about one defined
+// protected area within the system.
 //
 message ProtectedAreaConfiguration {
   string name = 1; // unique identifier for this protected area
@@ -69,8 +73,7 @@ message ProtectedAreaConfiguration {
 }
 
 //
-// ClassificationLevel
-// enumeration of available classification levels for the system
+// The ClassificationLevel enumeration of available classification levels for the system.
 //
 enum ClassificationLevel {
   CLASSIFICATION_UNKNOWN = 0; // unknown / unset
@@ -80,13 +83,11 @@ enum ClassificationLevel {
 }
 
 //
-// DeviceConfiguration
-// Top level configuration message for devices configured within the system. These are
-// values that are defined in configuration and will not change over time with
-// device status.
+// The DeviceConfiguration message contains detailed configuration for a device within the system. These are
+// values that are defined in configuration and will not change over time with device status.
 //
 message DeviceConfiguration {
-  string deviceName = 1; // User-friendly name for this device
+  reserved 1; // was previously deviceName
   string deviceId = 2; // The unique id for this device
 
   // The id of the container application that is managing this device. This ID should match the
@@ -107,9 +108,8 @@ message DeviceConfiguration {
 }
 
 //
-// DeviceHandlerType
-// This enumeration defines the protocol that a device speaks; this critical enumeration defines how to communicate
-// with the device in its native language.
+// The DeviceHandlerType enumeration defines the protocol that a device speaks; this critical enumeration
+// defines how to communicate with the device in its native language.
 //
 enum DeviceHandlerType {
   HANDLER_UNKNOWN = 0 [(description) = "Unknown"]; // UNDEFINED value
@@ -126,17 +126,20 @@ enum DeviceHandlerType {
 }
 
 //
-// SubDeviceInfo
-// The specific fields for a device that is a sub-device - ie it has a parent device
+// The SubDeviceInfo message provides specific data for a device that is a sub-device - ie it has a parent device.
+// The existence of this message also defines whether the device is a sub-device or not.
 //
 message SubDeviceInfo {
   string parentId = 1; // device id for parent
-  bool parentAggregatesCapabilities = 2; //boolean to control whether this devices capabilities will be displayed under the parent on the HMI
+
+  // this value controls whether this devices' capabilities will be made available for the parent
+  // of this sub-device.
+  bool parentAggregatesCapabilities = 2;
 }
 
 //
-// DeviceVisualsConfiguration
-// Contains info about how the device should be displayed
+// The DeviceVisualsConfiguration message contains details about how the device should be displayed to
+// an operator.
 //
 message DeviceVisualsConfiguration {
   string symbolCode = 1; // 15 character MIL-STD 2525C representing a symbol to display the symbol.
@@ -144,9 +147,8 @@ message DeviceVisualsConfiguration {
 }
 
 //
-// DeviceOperationType
-// The set of operational capabilities that are available to be active or inactive
-// for a given device.
+// The DeviceOperationType enumeration provides the possible set of operational capabilities
+// that are available for a given device.
 //
 enum DeviceOperationType {
   OP_TYPE_UNKNOWN = 0;
@@ -160,14 +162,16 @@ enum DeviceOperationType {
 }
 
 //
-// CoverageSector
-// Message for representing one of a devices' coverage sectors (range fan/ring). Notes:
-//   - A start/stop azimuth of 0/360 represents a device with 360 FOV.
-//   - A start/stop az of 355/5 would be a valid 10 degree FOV centered at 0 degrees.
-//   - If a device doesn't have a start/stop azimuth, then start and stop should be set to 0 and 360 for a range fan to be visible.
-//   - startElevation should be less than or equal to endElevation
-//   - If a device doesn't have a start/stop elevation, then start and stop should be set to -90/90
-//   - initial CoverageSectors are defined in configuration, overwritten by DeviceStatus
+// The CoverageSector message represents one of a devices' coverage sectors (range fan/ring).
+// Notes:
+//  <ul>
+//   <li> - A start/stop azimuth of 0/360 represents a device with 360 FOV. </li>
+//   <li> - A start/stop az of 355/5 would be a valid 10 degree FOV centered at 0 degrees. </li>
+//   <li> - If a device doesn't have a start/stop azimuth, then start and stop should be set to 0 and 360 for a range fan to be visible. </li>
+//   <li> - startElevation should be less than or equal to endElevation </li>
+//   <li> - If a device doesn't have a start/stop elevation, then start and stop should be set to -90/90 </li>
+//   <li> - initial CoverageSectors are defined in configuration, overwritten by DeviceStatus </li>
+// </ul>
 //
 message CoverageSector {
   // defines the operation associated with this coverage sector for a device
@@ -177,8 +181,9 @@ message CoverageSector {
 }
 
 //
-// DeviceCapabilitiesConfiguration
-// All of the capabilities a device supports like supported commands.
+// The DeviceCapabilitiesConfiguration message defines all of the capabilities a device supports, and the details
+// for each capability. Devices can have multiple instances of each capability type, as long as each instance
+// has a unique display name.
 //
 message DeviceCapabilitiesConfiguration {
   bool sendsTracks = 1; // if the device send tracks
@@ -194,14 +199,17 @@ message DeviceCapabilitiesConfiguration {
   bool registrationRequired = 11; // The flag for if registration command is required for the device
 }
 
-//Defines the specific rules for receiving threats
+//
+// The ThreatCapabilitiesConfiguration message defines if a device should receive threats in the system as
+// they are coming in, along with (optionally) a filter definition for what threats to receive.
+//
 message ThreatCapabilitiesConfiguration {
   bool receivesThreats = 1; //If the device receives threats
   FilterConfig threatFilter = 2; //How the threats should be filtered
 }
 
 //
-// Properties on every capability
+// The CapabilityProperties message contains properties that are available across every capability type.
 //
 message CapabilityProperties {
   string displayName = 1; // User-friendly name for SLEW command on a UI. Required
@@ -213,7 +221,8 @@ message CapabilityProperties {
 }
 
 //
-// Used for grouping commands together, in order of kill chain
+// The CapabilityGroup enumeration defines a rough grouping of capability types.
+// It is used for grouping commands together, in order of kill chain.
 //
 enum CapabilityGroup {
   CAP_GROUP_UNKNOWN = 0;
@@ -225,8 +234,8 @@ enum CapabilityGroup {
 }
 
 //
-// GenericCameraConfiguration
-// Info about a camera attached to a device such as video stream info and accepted commands.
+// The GenericCameraConfiguration message contains information about a camera attached to a device.
+// This includes details about camera type, accepted commands for the camera, and video stream details.
 //
 message GenericCameraConfiguration {
   string cameraName = 1; //A name associated with this camera. Useful for commanding a specific camera on a device.
@@ -237,8 +246,8 @@ message GenericCameraConfiguration {
 }
 
 //
-// CameraVideoConfiguration
-// Info about a video stream associated with a camera such as the name and stream url.
+// The CameraVideoConfiguration message contains details about a video stream associated with a camera,
+// including the name, stream URL, and recording/display properties.
 //
 message CameraVideoConfiguration {
   string displayName = 1; // A user-friendly name associated with the stream.
@@ -249,8 +258,7 @@ message CameraVideoConfiguration {
 }
 
 //
-// CameraTypeEnum
-// The type of camera attached to a device.
+// Type information for a camera attached to a device.
 //
 enum CameraTypeEnum {
   CAMERA_TYPE_DEFAULT = 0; // Unknown
@@ -259,8 +267,7 @@ enum CameraTypeEnum {
 }
 
 //
-// VideoFormatEnum
-// The type of video a given camera produces.
+// The type of video format a given camera produces.
 //
 enum VideoFormatEnum {
   VIDEO_FORMAT_DEFAULT = 0; //Unknown / default
@@ -270,8 +277,8 @@ enum VideoFormatEnum {
 }
 
 //
-// PointingCapabilitiesConfiguration
-// The slew capabilities of a device. Details about what slew commands a device can perform.
+// The PointingCapabilitiesConfiguration message contains slew capability details for a device;
+// specifically what slew commands a device can perform, or what information is needed to perform a slew.
 //
 message PointingCapabilitiesConfiguration {
   CapabilityProperties properties = 1;
@@ -279,37 +286,39 @@ message PointingCapabilitiesConfiguration {
 }
 
 //
-// EwCapabilityConfiguration
-// Specific details for the EW countering capability for a device
+// The EwCapabilityConfiguration message contains specific details for the EW countering
+// capability for a device.
 //
 message EwCapabilityConfiguration {
-  CapabilityProperties properties = 1; // Properties for this capability
+  CapabilityProperties properties = 1; // Generic properties for this capability
   bool isBarrageOption = 2; // If this capability should be used as part of Barrage(JAM_ALL)
   bool isPnt = 3; // If this capability affects GPS
   repeated double frequencies = 4; // The set of frequencies this EW command affects.
 }
 
 //
-// CapabilityConstraints
-// The defined set of constraints on what it takes to execute a given command/capability
+// The CapabilityConstraints message contains the defined set of constraints on what it
+// takes to execute a given command/capability.
 //
 message CapabilityConstraints {
-  // means this can always run, no point or threat needed
+  // Means this capability can always run, no selected point or threat needed.
   bool requiresNothing = 1;
-  // slew|probe -to-position AND to a repeated set of points from the SDK (usually for a threat)
+  // If true, means that this command can run against a selected point on the map.
+  // SLEW|PROBE -to-position check for this constraint.
+  // AND to a repeated set of points from the SDK (usually for a threat)
   bool requiresPoint = 2;
-  // automatically follows a threat id by itself (slew-auto command)
+  // If true, this command requires a selected 3D target in order to run.
+  // SLEW|PROBE -to-cue check for this constraint.
   bool requiresTarget = 3;
-  // filtering constraints – additional constraints on top of requiresPoint
+  // Filtering constraints on what threats are acceptable for running against, if requiresTarget is true
   FilterConfig threatFilters = 4;
 }
 
 
 //
-// DeviceSpatialFactors
-// Spatial data for a device, as a child of device configuration/status. This contains active position information for this
+// The DeviceSpatialFactors message contains spatial data for a device, as a field within
+// device configuration and status. This message contains active position information for this
 // device over time.
-// Child of DeviceStatus and DeviceConfiguration
 //
 message DeviceSpatialFactors {
   CoordinateLla emplacement = 1; // The location of the device. Altitude should only be in HAE.
@@ -320,7 +329,8 @@ message DeviceSpatialFactors {
 }
 
 //
-//Collection of flags for the usages of various spacial factors in status messages
+// The SpatialFactorsStatusUsage message contains a set of flags that define what fields within a
+// device status to use or ignore.
 //
 message SpatialFactorsStatusUsage{
   bool ignoreStatusCoverageSectors = 1; //Flag to determine whether to use the configured vs reported Coverage Sectors
@@ -329,27 +339,10 @@ message SpatialFactorsStatusUsage{
   bool ignoreStatusHomePosition = 4; //Flag to determine whether to use the configured vs reported Reference Position
 }
 
-//
-// DeviceTransportInfo
-// Transport details for a device
-//
-message DeviceTransportInfo {
-  DeviceTransportType type = 1; // the kind of transport this is for our device
-  TransportConfiguration configuration = 2; //the specific details of the transports network type, destination, and port.
-}
 
 //
-// VideoTransportInfo
-// Transport details for a device
-//
-message VideoTransportInfo {
-  TransportConfiguration configuration = 1; //the specific details of the transports network type, destination, and port.
-  string path = 2; // the path to record the video to
-}
-
-//
-// DeviceTransportType
-// The kind of data this transport is supporting for a device
+// The DeviceTransportType enumeration defines the kind of data a transport supports for a device
+// in the system. Part of the DeviceTransportInfo details.
 //
 enum DeviceTransportType {
   TRANSPORT_TYPE_UNKNOWN = 0; // Error/unset value
@@ -357,4 +350,20 @@ enum DeviceTransportType {
   TRANSPORT_TYPE_RESPONSE = 2; // a response transport; sends device status and tracks
   TRANSPORT_TYPE_CORRELATOR = 3; // forwarding transport to a correlator
   TRANSPORT_TYPE_THREAT = 4; // a threat transport; receives inbound threats
+}
+
+//
+// The DeviceTransportInfo message contains transport details for a device.
+//
+message DeviceTransportInfo {
+  DeviceTransportType type = 1; // the kind of transport this is for our device
+  TransportConfiguration configuration = 2; //the specific details of the transports network type, destination, and port.
+}
+
+//
+// The VideoTransportInfo message contains transport details for video coming from a device.
+//
+message VideoTransportInfo {
+  TransportConfiguration configuration = 1; //the specific details of the transports network type, destination, and port.
+  string path = 2; // the path to record the video to
 }

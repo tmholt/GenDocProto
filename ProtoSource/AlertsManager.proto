@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -9,51 +15,50 @@ package saic.valkyrie.sdk.generated;
 option java_package = "saic.valkyrie.sdk.generated";
 option java_outer_classname = "AlertsManagerProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
 //
-// AlertsManager
-// Service used to publish SystemAlerts to subscribers
+// The AlertsManager service is the central hub for alerts within the Valkyrie system.
+// Alerts are published to this service, and subscribed clients will receive those alerts
+// asynchronously as they come in. The service also maintains recent alerts, which can be
+// queried for.
 //
 service AlertsManager {
 
   //
-  // getVersion
-  // Get the version of the Configuration manager. this is a unary blocking call.
+  // Retrieves version information for the AlertsManager service.
   //
   rpc getVersion (google.protobuf.Empty) returns (VersionInfo);
 
   //
-  // getRecentAlerts
-  // Ability to request the list of recent alerts.
-  //
-  // Output: A stream of SystemAlert objects.
+  // Returns a stream of all recent alerts, and then completes the stream.
   //
   rpc getRecentAlerts (google.protobuf.Empty) returns (stream SystemAlert);
 
   //
-  // dismissAlert
-  // Ability to dismiss an alert from the alerts manager.
-  // NOTE: This call is intended to completely dismiss (remove) an alert from the alert manager.
+  // The DismissAlert call removes one alert from the recent alerts list and from the
+  // critical alerts list. A critical alert never times out (like recent alerts do), and so
+  // are never removed from the list sent to clients until specifically dismissed.
   //
   rpc dismissAlert (AlertDismissalRequest) returns (ResponseInfo);
 
   //
-  // sendAlert
-  // Ability to send a system-wide alert from a SDK client to all subscribed clients.
-  // NOTE: does not send out across VALKYRIE as an alert.
+  // The SendAlert call publishes one alert to the Alerts Manager, which is then added to the recent
+  // alerts list and published out to all subscribed clients.
   //
   rpc sendAlert (SystemAlert) returns (ResponseInfo);
 
   //
-  // subscribe
-  // Ability for a client to receive status, heartbeats, and alerts as they occur within the system
-  // from DON services.
+  // Ability for a client to subscribe to system alerts, and receive them back as they occur.
+  // The request contains specifics for what kind of alerts the client would like to receive.
+  // The client immediately receives recent alerts via the response stream, and then additional
+  // alerts as they occur.
   //
   rpc subscribe (ClientAlertsSubscription) returns (stream AlertsSubscriptionResponse);
 }
 
 //
-// ClientAlertsSubscription
-// Message used to subscribe a client to the AlertsManager
+// The ClientAlertsSubscription message is used to subscribe a client to the AlertsManager. It
+// provides the specific alert types that the client would like to receive.
 //
 message ClientAlertsSubscription {
   bool subscribeToDeviceAlerts = 1;
@@ -62,16 +67,16 @@ message ClientAlertsSubscription {
 }
 
 //
-// AlertsSubscriptionResponse
-// Message used to send SystemAlerts to subscribers
+// The AlertsSubscriptionResponse message is sent back to subscribed clients as alerts occur within the system.
+// It contains all of the details related to one system alert.
 //
 message AlertsSubscriptionResponse {
   SystemAlert alert = 1;
 }
 
 //
-// AlertDismissalRequest
-// Message used to dismiss a SystemAlert from the alerts manager
+// The AlertDismissalRequest message is used to dismiss an alert from the alerts manager. It is
+// used in the {@link #dismissAlert() DismissAlert} RPC call.
 //
 message AlertDismissalRequest {
   string alertId = 1;

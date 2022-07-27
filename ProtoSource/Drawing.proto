@@ -1,0 +1,129 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
+
+syntax = "proto3";
+
+import "google/protobuf/descriptor.proto";
+import "Common.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "DrawingProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+
+//
+// The ARGBColor message provides details to describe a color.
+// Color is encoded such that:
+// <code>
+// int color = (alpha & 0xff) << 24 | (red & 0xff) << 16 | (green & 0xff) << 8 | (blue & 0xff);
+// </code>
+//
+message ARGBColor {
+  uint32 a = 1; // alpha, 0-255
+  uint32 r = 2; // red, 0-255
+  uint32 g = 3; // green, 0-255
+  uint32 b = 4; // blue, 0-255
+}
+
+//
+// The ShapeFillAttributes message contains details on how to draw a closed shape.
+//
+message ShapeFillAttributes {
+  ARGBColor fillColor = 1; // fill color
+  ARGBColor lineColor = 2; // line color
+  uint32 lineWidth = 3; // line width in pixels
+}
+
+//
+// The LineAttributes message contains details on how to draw a line.
+//
+message LineAttributes {
+  ARGBColor lineColor = 1; // line color
+  uint32 lineWidth = 2; // line width in pixels
+}
+
+//
+// The TextAttributes message contains details on how to draw text.
+//
+message TextAttributes {
+  ARGBColor textColor = 1; // text color
+  string fontFamily = 2; // font to use
+  uint32 fontSize = 3; // font size, in points
+}
+
+//
+// The PolygonShape message contains the details for a closed polygon shape.
+//
+message PolygonShape {
+  ShapeFillAttributes fill = 1; // drawing attributes
+  repeated CoordinateLla coordinates = 2; // vertex points. Do not repeat first point, this will happen automatically.
+}
+
+//
+// The PolyLineShape message contains the details for a multi-segmented line shape.
+//
+message PolyLineShape {
+  LineAttributes fill = 1; // drawing attributes
+  repeated CoordinateLla coordinates = 2; // vertex points
+}
+
+//
+// The TextShape message contains details for a text shape.
+//
+message TextShape {
+  TextAttributes fill = 1; // drawing attributes
+  string text = 2; // the text to draw
+  CoordinateLla origin = 3; // bottom-left for text positioning
+}
+
+//
+// The CircleShape message contains details for a circle shape.
+//
+message CircleShape {
+  ShapeFillAttributes fill = 1; // drawing attributes
+  CoordinateLla origin = 2; // center point for circle
+  double radius = 3; // radius of the circle, in meters
+}
+
+//
+// The SectorShape message contains details for a sector shape.
+// This is officially known as an Annulus Sector.
+// An annulus is made of two concentric (same center) circles of different size.
+// An annulus sector is a cut from an annulus, which is bordered by two straight lines from its center.
+// Think of a donut with a bite out of it.
+//
+message SectorShape {
+  ShapeFillAttributes fill = 1; // drawing attributes
+  CoordinateLla origin = 2; // center point for donut
+  double innerRadius = 3; // inner radius of the circle, in meters
+  double outerRadius = 4; // outer radius of the circle, in meters
+  Orientation startingAngle = 5; // starting az/el in degrees  [0, 360] for AZ, [-90, 90] for EL
+  Orientation endingAngle = 6; // ending az/el in degrees [0, 360] for AZ, [startElevation, 90] for EL
+}
+
+//
+// The PointMarkerShape message contains details for a single-point marker shape.
+//
+message PointMarkerShape {
+  ARGBColor fillColor = 1; // fill color
+  CoordinateLla origin = 2; // center point for a point marker shape
+  double scalingFactor = 3; // scalingFactor of the point
+}
+
+//
+// The ShapeType enumeration contains the set of available drawing shapes.
+//
+enum ShapeType {
+  SHAPE_UNKNOWN = 0 [(description) = "Unknown"]; // not set / error
+  SHAPE_CIRCLE = 1 [(description) = "Circle"]; // circle shape
+  SHAPE_POLYGON = 2 [(description) = "Polygon"]; // polygon shape
+  SHAPE_POLYLINE = 3 [(description) = "Poly-line"]; // polyline shape
+  SHAPE_TEXT = 4 [(description) = "Text"]; // text shape
+  SHAPE_POINT_MARKER = 5 [(description) = "Single point"]; // point shape
+  SHAPE_SECTOR = 6 [(description) = "Donut"]; // Annulus Sector shape
+}

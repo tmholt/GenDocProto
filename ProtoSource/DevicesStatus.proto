@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -11,9 +17,8 @@ option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 
 //
-// DeviceWarningTypeEnum
-// device warning message type
-// These items are ordered in a priority such that 0 is the least priority and the last entry is the highest priority
+// The DeviceWarningTypeEnum enumeration details a device warning message type.
+// These items are ordered in a priority such that 0 is the least priority and the last entry is the highest priority.
 //
 enum DeviceWarningTypeEnum {
   DEVICE_WARNING_OTHER = 0[(description)="Other"]; // OTHER warnings
@@ -29,12 +34,8 @@ enum DeviceWarningTypeEnum {
   DEVICE_WARNING_HARDWARE_ERROR = 10[(description)="Hardware Error"]; // the device reports a hardware error
 }
 
-
-
-
 //
-// DeviceWarningMessage
-// device warning message
+// The DeviceWarningMessage message contains details for one device warning message.
 //
 message DeviceWarningInfo {
   DeviceWarningTypeEnum warningType = 1; // The type of warning like timeout or hardware-reported error
@@ -42,8 +43,7 @@ message DeviceWarningInfo {
 }
 
 //
-// DeviceStatus
-// Details about one device in the system, and its current status
+// The DeviceStatus message contains details about one device in the system and its current status.
 //
 message DeviceStatus {
   int64 timestamp = 1; // status update timestamp (milliseconds since epoch)
@@ -62,8 +62,7 @@ message DeviceStatus {
 }
 
 //
-// DeviceOperationState
-// The active state for one operational capability or capability option for a given device.
+// The DeviceOperationState enumeration details possible states for one device operational capability.
 //
 enum DeviceOperationState {
   OP_STATE_UNKNOWN = 0; // unknown state
@@ -74,9 +73,9 @@ enum DeviceOperationState {
 }
 
 //
-// DeviceOperationalState
-// Details for the current operational state for one capability for a device. Every capability, including repeated
-// capabilities such as EW, should be present with a state as separate DeviceOperationalState messages.
+// The DeviceOperationalState message contains details for the current operational state for one capability
+// of a device. Every capability of a device, including repeated capabilities such as EW, should be represented
+// as one value within a DeviceStatus message.
 //
 message DeviceOperationalState {
   DeviceOperationType operation = 1; // the operational capability for this device

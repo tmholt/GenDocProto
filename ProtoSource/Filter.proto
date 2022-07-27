@@ -1,7 +1,14 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
 import "Common.proto";
+import "Drawing.proto";
 import "Threats.proto";
 
 package saic.valkyrie.sdk.generated;
@@ -10,7 +17,8 @@ option java_outer_classname = "FilterProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 //
-// Filter configuration message containing rules to filter with, defined areas, and a default action to take
+// This filter configuration message contains rules for filtering threat messages to be sent to a client,
+// including rules, conditions, defined areas, and default action to take.
 //
 message FilterConfig {
   string id = 1; // Unique id name for this filter config
@@ -22,8 +30,8 @@ message FilterConfig {
 }
 
 //
-// Rules work as an OR operation like as series of ifs and else ifs.
-// If ALL of the conditions of the rule are TRUE then the rule is applied for this rule and the remaining rules are
+// Rules work as an OR operation like a series of ifs and else ifs.
+// If ALL of the conditions of the rule are TRUE then the action is applied for this rule and the remaining rules are
 // skipped.
 //
 message FilterRule {
@@ -33,7 +41,8 @@ message FilterRule {
 }
 
 //
-// A filter area containing an id and a shape
+// A filter area containing an id and a shape. Filter areas are defined once and then references within filter
+// rules.
 //
 message FilterArea {
   string id = 1; // Id to allow for re-use of shape within the FilterConfig
@@ -44,7 +53,7 @@ message FilterArea {
 }
 
 //
-// Defines what type of filter condition is used
+// The FilterCondition message defines what type of filter condition is used within a rule.
 //
 message FilterCondition {
   oneof data {
@@ -60,8 +69,8 @@ message FilterCondition {
 }
 
 //
-// Action to declare if the threat will be sent or not sent
-// If used for capability, action to declare if capability is able to be used or not.
+// The action to perform if a ruleset passes, and defines if the threat will be sent or not sent to the client
+// with these rules attached. If used for a capability, the action to declare if capability is able to be used or not.
 //
 enum FilterAction {
   FILTER_ACTION_INCLUDE = 0;
@@ -69,7 +78,7 @@ enum FilterAction {
 }
 
 //
-// Priority to compare against
+// For priority conditions, the priority to compare against.
 //
 message PriorityCondition {
   Priority priority = 1; // The priority
@@ -78,7 +87,7 @@ message PriorityCondition {
 }
 
 //
-// Dimension to compare against
+// For dimension conditions, the dimension to compare against.
 //
 message DimensionCondition {
   DimensionType dimension = 1; // The dimension
@@ -86,7 +95,7 @@ message DimensionCondition {
 }
 
 //
-// The type of dimensions possible
+// For dimension conditions, the type of dimensions possible.
 //
 enum DimensionType {
   ZERO_DIMENSIONAL = 0; // No dimensions available
@@ -96,7 +105,7 @@ enum DimensionType {
 }
 
 //
-// The affiliation to compare against
+// For affiliation conditions, the affiliation to compare against.
 //
 message AffiliationCondition {
   TargetAffiliation affiliation = 1; // The affiliation
@@ -104,7 +113,7 @@ message AffiliationCondition {
 }
 
 //
-// The classification to compare against
+// For classification conditions, The classification to compare against.
 //
 message ClassificationCondition {
   TargetClassification classification = 1; // The classification
@@ -112,7 +121,7 @@ message ClassificationCondition {
 }
 
 //
-// The area to compare against
+// For area conditions, the area to compare against.
 //
 message AreaCondition {
   string filterAreaId = 1; // The filter area's id to use in this condition
@@ -120,7 +129,7 @@ message AreaCondition {
 }
 
 //
-// The type of area condition.
+// For area conditions, the type of area condition.
 // On boundary of area is considered Inside
 //
 enum AreaConditionType {
@@ -129,7 +138,7 @@ enum AreaConditionType {
 }
 
 //
-//The altitude to compare against
+// For altitude conditions, The altitude to compare against.
 //
 message AltitudeCondition {
   double altitudeHae = 1; // meters
@@ -137,7 +146,7 @@ message AltitudeCondition {
 }
 
 //
-// The speed to compare against
+// For speed conditions, the speed to compare against.
 //
 message SpeedCondition {
   double speed = 1; // meters/second
@@ -145,6 +154,7 @@ message SpeedCondition {
 }
 
 //
+// For device conditions, the device to compare against.
 // This condition is true if the threat has one of these devices as a track source.
 //
 message DevicesCondition {
@@ -153,7 +163,7 @@ message DevicesCondition {
 }
 
 //
-// The type of numerical comparison to be used
+// The type of numerical comparison to be used.
 //
 enum NumericalComparison {
   NUM_COMPARE_LESS_OR_EQUAL = 0; // Threat data is less than or equal to condition

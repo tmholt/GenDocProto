@@ -1,3 +1,9 @@
+/*------------------------------------------------------------------------------
+| SAIC PROPRIETARY INFORMATION
+|-------------------------------------------------------------------------------
+| The information in this document is proprietary to SAIC. It may not be used,
+| reproduced, disclosed, or exported without the written approval of SAIC.
+------------------------------------------------------------------------------*/
 
 syntax = "proto3";
 
@@ -9,10 +15,8 @@ option java_outer_classname = "SystemAlertsProto";
 option csharp_namespace = "SAIC.Valkyrie.Api.V1";
 
 
-
 //
-// SystemAlertPriority enumeration
-// The importance level for this alert. Helps determine display.
+// The SystemAlertPriority type enumerates importance levels for an alert.
 //
 enum SystemAlertPriority {
   ALERT_PRIORITY_LOW = 0;
@@ -22,8 +26,7 @@ enum SystemAlertPriority {
 }
 
 //
-// SystemAlertType enumeration
-// The specific kind of alert this represents
+// The SystemAlertType enumeration defines the specific kind for one alert.
 //
 enum SystemAlertType
 {
@@ -37,9 +40,8 @@ enum SystemAlertType
 }
 
 //
-// SystemAlert
-// Alerts are used to indicate important changes in the system and are used as a mechanism to broadcast
-// important messages to the operator.
+// The SystemAlert message contains details about one system alert - which is used to indicate important
+// events and changes in the system, and are broadcast to operators of the system.
 //
 message SystemAlert {
   int64 timestamp = 1; // alert creation timestamp (milliseconds since epoch)
@@ -65,9 +67,9 @@ message SystemAlert {
 }
 
 //
-// SystemAlertStatusChanges
-// If a system alert involves a change in status for a device/service/client, this message
-// details that change in operational status. optional.
+// The SystemAlertStatusChanges message contains details about a change in status
+// for a device/service/client, this message details that change in operational status.
+//
 message SystemAlertStatusChanges {
   OperationalStatus previousStatus = 1; // previous state for source item
   OperationalStatus newStatus = 2; // current state for this source item
